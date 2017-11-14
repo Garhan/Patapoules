@@ -5,6 +5,9 @@
 
 int main()
 {
+
+
+
     using namespace sf;
     //Creation de la fenetre
     RenderWindow app(VideoMode(800, 600), "SFML window");
@@ -125,13 +128,14 @@ int main()
         Time deltaTime = deltaClock.restart();
         //On crée un event
         Event event;
-        //On scanne l'event pour réaliser des actions ponctuelles
+        //On scanne l'event pour réaliser des actions ponctuelles, a la PREMIERE frame
         while (app.pollEvent(event))
         {
             //On ferme la fenetre quand on appuie sur la croix rouge
             if (event.type == Event::Closed)
                 app.close();
 
+            /* Debug Clock Frame
             if (event.type == Event::KeyPressed)
             {
                 if (event.key.code == Keyboard::T)
@@ -141,31 +145,39 @@ int main()
                 }
 
             }
+            */
 
 
         }
+        //La structure "if(Keyboard::isKeyPressed(Keyboard::___)) renvoie un booleen a CHAQUE frame
 
-
+        //On utilise un if(keyboard... pour ne pas avoir a tester une condition dans l'event
         if(Keyboard::isKeyPressed(Keyboard::Up) && !isJumping)
         {
+
             playerVelocity.y = -500.f;
+            //On évite le multiple-saut
             isJumping = true;
         }
 
+        //On applique la physique de la gravité
         if(isJumping)
         {
             playerVelocity.y += (gravity * deltaTime.asSeconds());
             spritePp.move(playerVelocity * deltaTime.asSeconds());
         }
 
-
+        //On stoppe la chute quand la patapoule touche le sol
         if(spritePp.getPosition().y > 670.f)
-                {
+        {
                         spritePp.setPosition( { spritePp.getPosition().x, 670.f } );
                         isJumping = false;
-                }
+        }
+
+        //On clear le tableau
         app.clear();
 
+        //On dessine le niveau, la patapoule et tous les ennemis avec app.draw
         app.draw(spriteNiv);
         app.draw(spritePp);
         for (int i = 0; i < nbEnnemis; i=i+1)
@@ -174,18 +186,17 @@ int main()
 
             app.draw(spriteEnnemis[i]);
 
-
         }
-
+        //movement vers la gauche
         if (Keyboard::isKeyPressed(Keyboard::Left))
         {
-
+            //tant que la camera n'est pas trop proche de la limite, on la bouge avec la patapoule
             if ( (spritePp.getPosition().x >= (view1.getSize().x)/2) && (spritePp.getPosition().x <= spriteNiv.getGlobalBounds().width-(view1.getSize().x/2)))
                 //Camera is not exiting level
                 view1.move(Vector2f(-speed, 0)* deltaTime.asSeconds());
 
 
-
+            //tant que la patapoule n'est pas trop proche de la limite, on la bouge vers la gauche
             if (spritePp.getPosition().x >= 25 )
             {
                 spritePp.move(Vector2f(-speed, 0) * deltaTime.asSeconds());
@@ -193,6 +204,8 @@ int main()
             }
 
         }
+
+        //Idem Droite
         if (Keyboard::isKeyPressed(Keyboard::Right))
         {
 
@@ -208,19 +221,24 @@ int main()
             }
 
         }
-
+        //Test son
         if (Keyboard::isKeyPressed(Keyboard::S))
         {
             sound.play();
         }
+
+        /*
         if (Keyboard::isKeyPressed(Keyboard::P))
         {
             std::cout <<"posy : "<< spritePp.getPosition().y << std::endl;
 
 
-        }
+        }*/
 
+        //On configure la caméra sur view1
         app.setView(view1);
+
+        //On affiche la fenetre
         app.display();
 
 
