@@ -6,22 +6,28 @@
 int main()
 {
     using namespace sf;
-    //Création de la fenetre
+    //Creation de la fenetre
     RenderWindow app(VideoMode(800, 600), "SFML window");
-    //Désactivation de la répétition des inputs lors d'appui prolongé
+    //Desactivation de la repetition des inputs lors d'appui prolonge
     app.setKeyRepeatEnabled(false);
-    //Création d'une seed pour le random
+    //Creation d'une seed pour le random
     srand (time(NULL));
 
+
+    //Camera principale du jeu
     View view1;
 
+    //Horloge Globale et par Frame
     Clock clock;
     Clock deltaClock;
 
+    //Valeur de gravité
     float gravity = 1000.f;
 
+    //Noombre d'ennemis
     int nbEnnemis = 600;
 
+    //parametres du joueur
     float speed = 500.0f;
     Vector2f playerVelocity;
     bool isJumping = true;
@@ -48,7 +54,7 @@ int main()
 
 
 
-    //Déclaration et assignation des Sprites des ennemis
+    //Declaration et assignation des Sprites des ennemis
 
         Sprite *spriteEnnemis;
 
@@ -67,7 +73,7 @@ int main()
             //Ajustement de la taille des ennemis
             spriteEnnemis[i].setScale(0.2f,0.2f);
 
-            //Positionnement aléatoire
+            //Positionnement aleatoire
             float posEnnemi = (rand()%6000);
             spriteEnnemis[i].setPosition(posEnnemi,600);
         }
@@ -77,7 +83,7 @@ int main()
 
 
 
-    //Déclaration du sprite patapoule
+    //Declaration du sprite patapoule
         Sprite spritePp;
 
         //Assignation de la texture
@@ -91,7 +97,7 @@ int main()
 
 
 
-    //Déclaration du sprite du Niveau
+    //Declaration du sprite du Niveau
         Sprite spriteNiv;
 
         //Assignation de la texture
@@ -101,27 +107,28 @@ int main()
         spriteNiv.setPosition(Vector2f(0,-2100));
 
     //Systeme de son
-        //On déclare un buffer pour un son court
+        //On declare un buffer pour un son court
         SoundBuffer buffer;
         //On assigne un son au buffer
          if (!buffer.loadFromFile("0453.ogg"))
             return -1;
 
-        //On crée le son
+        //On cree le son
         Sound sound;
         //On assigne le buffer au son
         sound.setBuffer(buffer);
 
 
-
+    //Boucle de jeu
     while (app.isOpen())
     {
         Time deltaTime = deltaClock.restart();
-        // Process events
+        //On crée un event
         Event event;
+        //On scanne l'event pour réaliser des actions ponctuelles
         while (app.pollEvent(event))
         {
-            // Close window : exit
+            //On ferme la fenetre quand on appuie sur la croix rouge
             if (event.type == Event::Closed)
                 app.close();
 
