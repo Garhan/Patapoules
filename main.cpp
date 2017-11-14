@@ -6,62 +6,130 @@
 int main()
 {
     using namespace sf;
-    sf::RenderWindow app(sf::VideoMode(800, 600), "SFML window");
-
-    sf::Clock clock;
-    sf::Clock deltaClock;
-    float speed = 2500.0f;
+    //Création de la fenetre
+    RenderWindow app(VideoMode(800, 600), "SFML window");
+    //Désactivation de la répétition des inputs lors d'appui prolongé
     app.setKeyRepeatEnabled(false);
-    sf::Vector2f playerVelocity;
-    bool isJumping = true;
+    //Création d'une seed pour le random
+    srand (time(NULL));
+
+    View view1;
+
+    Clock clock;
+    Clock deltaClock;
+
     float gravity = 1000.f;
-    // Load a sprite to display
-    sf::Texture texturePp;
-    if (!texturePp.loadFromFile("patapoule.png"))
-        return -1;
 
-    sf::Sprite spritePp;
-    spritePp.setTexture(texturePp);
-    spritePp.setScale(sf::Vector2f(0.1f, 0.1f));
-    spritePp.setOrigin(sf::Vector2f(250.0f,250.0f));
-    spritePp.setPosition(sf::Vector2f(200,650));
+    int nbEnnemis = 600;
+
+    float speed = 500.0f;
+    Vector2f playerVelocity;
+    bool isJumping = true;
 
 
-     sf::Texture textureNiv;
+
+    //Declaration et chargement des Textures
+        //Patate
+        Texture texturePatate;
+        if (!texturePatate.loadFromFile("patate.png"))
+            return -1;
+        //Poule
+        Texture texturePoule;
+        if (!texturePoule.loadFromFile("poule.png"))
+            return -1;
+        //Patapoule
+        Texture texturePp;
+        if (!texturePp.loadFromFile("patapoule.png"))
+            return -1;
+        //Niveau
+        Texture textureNiv;
     if (!textureNiv.loadFromFile("niveau.png"))
         return -1;
 
-    sf::Sprite spriteNiv;
-    spriteNiv.setTexture(textureNiv);
-    spriteNiv.setScale(sf::Vector2f(5.0f,5.0f));
-    spriteNiv.setPosition(sf::Vector2f(0,-2100));
 
 
-    sf::SoundBuffer buffer;
-     if (!buffer.loadFromFile("0453.ogg"))
-        return -1;
+    //Déclaration et assignation des Sprites des ennemis
 
-    sf::Sound sound;
-    sound.setBuffer(buffer);
+        Sprite *spriteEnnemis;
 
-    sf::View view1;
-	// Start the game loop
+        spriteEnnemis = new Sprite[nbEnnemis];
+
+        for (int i = 0; i < nbEnnemis; i=i+1)
+        {
+            //1 chance sur 2 patate/poule
+            int typeEnnemi = rand() %2;
+
+            if (typeEnnemi == 1){
+                spriteEnnemis[i].setTexture(texturePatate);
+            } else {
+                spriteEnnemis[i].setTexture(texturePoule);
+            }
+            //Ajustement de la taille des ennemis
+            spriteEnnemis[i].setScale(0.2f,0.2f);
+
+            //Positionnement aléatoire
+            float posEnnemi = (rand()%6000);
+            spriteEnnemis[i].setPosition(posEnnemi,600);
+        }
+
+
+
+
+
+
+    //Déclaration du sprite patapoule
+        Sprite spritePp;
+
+        //Assignation de la texture
+        spritePp.setTexture(texturePp);
+        //Ajustement Taille, point d'origine et positionnement
+        spritePp.setScale(Vector2f(0.1f, 0.1f));
+        spritePp.setOrigin(Vector2f(250.0f,250.0f));
+        spritePp.setPosition(Vector2f(200,650));
+
+
+
+
+
+    //Déclaration du sprite du Niveau
+        Sprite spriteNiv;
+
+        //Assignation de la texture
+        spriteNiv.setTexture(textureNiv);
+        //Ajustement Taille et positionnement
+        spriteNiv.setScale(Vector2f(5.0f,5.0f));
+        spriteNiv.setPosition(Vector2f(0,-2100));
+
+    //Systeme de son
+        //On déclare un buffer pour un son court
+        SoundBuffer buffer;
+        //On assigne un son au buffer
+         if (!buffer.loadFromFile("0453.ogg"))
+            return -1;
+
+        //On crée le son
+        Sound sound;
+        //On assigne le buffer au son
+        sound.setBuffer(buffer);
+
+
+
     while (app.isOpen())
     {
-        sf::Time deltaTime = deltaClock.restart();
+        Time deltaTime = deltaClock.restart();
         // Process events
-        sf::Event event;
+        Event event;
         while (app.pollEvent(event))
         {
             // Close window : exit
-            if (event.type == sf::Event::Closed)
+            if (event.type == Event::Closed)
                 app.close();
 
-            if (event.type == sf::Event::KeyPressed)
+            if (event.type == Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::T)
+                if (event.key.code == Keyboard::T)
                 {
-                  sf::Time elapsed1 = clock.restart();
+                  Time elapsed1 = clock.restart();
                 std::cout << elapsed1.asSeconds() << std::endl;
                 }
 
@@ -71,9 +139,9 @@ int main()
         }
 
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !isJumping)
+        if(Keyboard::isKeyPressed(Keyboard::Up) && !isJumping)
         {
-            playerVelocity.y = -250.f;
+            playerVelocity.y = -500.f;
             isJumping = true;
         }
 
@@ -93,44 +161,52 @@ int main()
 
         app.draw(spriteNiv);
         app.draw(spritePp);
+        for (int i = 0; i < nbEnnemis; i=i+1)
+        {
+            if ((spriteEnnemis[i].getPosition().x < spritePp.getPosition().x - ((view1.getSize().x)/2) ||(spriteEnnemis[i].getPosition().x > spritePp.getPosition().x+view1.getSize().x)/2))
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            app.draw(spriteEnnemis[i]);
+
+
+        }
+
+        if (Keyboard::isKeyPressed(Keyboard::Left))
         {
 
             if ( (spritePp.getPosition().x >= (view1.getSize().x)/2) && (spritePp.getPosition().x <= spriteNiv.getGlobalBounds().width-(view1.getSize().x/2)))
                 //Camera is not exiting level
-                view1.move(sf::Vector2f(-speed, 0)* deltaTime.asSeconds());
+                view1.move(Vector2f(-speed, 0)* deltaTime.asSeconds());
 
 
 
             if (spritePp.getPosition().x >= 25 )
             {
-                spritePp.move(sf::Vector2f(-speed, 0) * deltaTime.asSeconds());
-                spritePp.rotate(-speed * deltaTime.asSeconds());
+                spritePp.move(Vector2f(-speed, 0) * deltaTime.asSeconds());
+                //spritePp.rotate(-speed * deltaTime.asSeconds());
             }
 
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        if (Keyboard::isKeyPressed(Keyboard::Right))
         {
 
 
             if ((spritePp.getPosition().x >= (view1.getSize().x)/2) && (spritePp.getPosition().x <= spriteNiv.getGlobalBounds().width-(view1.getSize().x/2)))
                 //Camera is not exiting level
-                view1.move(sf::Vector2f(speed, 0)* deltaTime.asSeconds());
+                view1.move(Vector2f(speed, 0)* deltaTime.asSeconds());
 
             if (spritePp.getPosition().x <= spriteNiv.getGlobalBounds().width - 25 )
             {
-                spritePp.move(sf::Vector2f(speed, 0) * deltaTime.asSeconds());
-                spritePp.rotate(speed * deltaTime.asSeconds());
+                spritePp.move(Vector2f(speed, 0) * deltaTime.asSeconds());
+                //spritePp.rotate(speed * deltaTime.asSeconds());
             }
 
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        if (Keyboard::isKeyPressed(Keyboard::S))
         {
             sound.play();
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+        if (Keyboard::isKeyPressed(Keyboard::P))
         {
             std::cout <<"posy : "<< spritePp.getPosition().y << std::endl;
 
