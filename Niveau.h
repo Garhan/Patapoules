@@ -17,7 +17,8 @@ class Niveau{
         sf::Sprite& getSprite();
         float getGravity();
         float getGround();
-
+        float getMinBorder();
+        float getMaxBorder();
 
 
 

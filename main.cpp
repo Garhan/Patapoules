@@ -46,9 +46,9 @@ int main()
             return -1;
 
 
-    Player player("patapoule.png",Vector2f(0.1f, 0.1f),Vector2f(250.0f,250.0f),Vector2f(200,650),2,200);
+    Player player("patapoule.png",Vector2f(0.2f, 0.2f),Vector2f(250.0f,250.0f),Vector2f(200,650),2,200);
 
-    Niveau niveau1("niveau.png",5.0, Vector2f(0,-2100),0.2f,670);
+    Niveau niveau1("niveau.png",5.0, Vector2f(0,-2100),-.0005f,645);
 
     Niveau currentLevel = niveau1;
 
@@ -181,16 +181,18 @@ int main()
         */
         if (Keyboard::isKeyPressed(Keyboard::Up))
         {
-            player.jump();
+            player.jump(0.4);
 
 
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Left))
         {
-            if (player.getSprite().getPosition().x >= 25 )
+            if (player.isInBounds(currentLevel) )
             {
                 player.move(Vector2f(-1.0,0.0),player.getSpeed(),deltaTime);
+                player.jump(0.15);
+                player.setLookDir(-1);
                 //spritePp.rotate(-speed * deltaTime.asSeconds());
             }
 
@@ -201,6 +203,8 @@ int main()
             if (player.getSprite().getPosition().x <= currentLevel.getSprite().getGlobalBounds().width - 25 )
             {
                 player.move(Vector2f(1.0,0.0),player.getSpeed(),deltaTime);
+                player.jump(0.15);
+                player.setLookDir(1);
                 //spritePp.rotate(-speed * deltaTime.asSeconds());
             }
 
@@ -247,14 +251,19 @@ int main()
             sound.play();
         }
 
-
+*/
         if (Keyboard::isKeyPressed(Keyboard::P))
         {
-            std::cout <<"posy : "<< spritePp.getPosition().y << std::endl;
+            std::cout <<"velocy : "<< player.getYVelocity() << std::endl;
 
 
         }
-*/
+        if (Keyboard::isKeyPressed(Keyboard::J))
+        {
+            std::cout <<"bounds : "<< player.isInBounds(currentLevel) << std::endl;
+
+
+        }
         app.draw(currentLevel.getSprite());
         app.draw(player.getSprite());
 

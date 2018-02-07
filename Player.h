@@ -16,7 +16,7 @@ class Player{
         sf::Sprite sprite;
         sf::Texture texturePp;
         bool isDead;
-        bool isJumping = true;
+        bool isJumping = false;
         float yVelocity;
 
     public :
@@ -24,8 +24,11 @@ class Player{
         Player(std::string filename,sf::Vector2f scale,sf::Vector2f selfOrigin,sf::Vector2f startPosition,int attack, int speed);
 
         void move(sf::Vector2f dir,float speed,sf::Time deltaTime);
-        void jump();
+        void jump(float jumpForce);
         void updateYMovement(Niveau &currentLevel);
+        void setLookDir(int dir);
+
+        bool isInBounds(Niveau &currentlevel);
 
         sf::Sprite& getSprite();
         int getSpeed();
@@ -36,6 +39,8 @@ class Player{
 
         void setJumping(bool jumping);
         void setYVelocity(float velocity);
+
+
 
 
     };

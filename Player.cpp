@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
+#include <cmath>
 Player::Player(std::string filename,sf::Vector2f scale,sf::Vector2f selfOrigin,sf::Vector2f startPosition,int attack, int speed){
 
         this->attack = attack;
@@ -25,35 +26,55 @@ void Player::move(sf::Vector2f dir, float speed,sf::Time deltaTime){
         sprite.move(dir * speed * deltaTime.asSeconds());
 
 }
-void Player::jump(){
+void Player::jump(float jumpForce){
 
     if(this->isJumping==false)
     {
-        this->setYVelocity(20);
-
+        this->setYVelocity(jumpForce);
+        //~= 0.25
     }
+
+    this->setJumping(true);
+}
+
+void Player::setLookDir(int dir){
+
+
+        this->sprite.setScale(fabs(this->sprite.getScale().x)*dir,this->sprite.getScale().y);
 
 }
 
-void updateYMovement(Niveau &currentLevel){
+void Player::updateYMovement(Niveau &currentLevel){
 
-        if (this->getSprite().getPosition().x > currentLevel.getGround()){
+        if (this->getSprite().getPosition().y < currentLevel.getGround()){
 
-            this->setYVelocity(this->getYVelocity()-currentLevel.getGravity())
+            this->setYVelocity(this->getYVelocity()+currentLevel.getGravity());
+
+            }
+    this->setJumping(true);
+
+        if (this->getSprite().getPosition().y == currentLevel.getGround()){
+
+            this->setJumping(false);
         }
 
-        if (this->getSprite().getPosition().x == currentLevel.getGround()){
+        if (this->getSprite().getPosition().y > currentLevel.getGround()){
 
             this->setYVelocity(0.f);
-        }
-
-        if (this->getSprite().getPosition().x < currentLevel.getGround()){
-
-            this->getSprite().setPosition(this->getSprite().getPosition().x,currentLevel.getGround()+5);
+            this->getSprite().setPosition(this->getSprite().getPosition().x,currentLevel.getGround());
         }
 
 
+        this->getSprite().setPosition(this->getSprite().getPosition().x,this->getSprite().getPosition().y-getYVelocity());
 
+}
+
+
+bool Player::isInBounds(Niveau &currentlevel){
+    sf::FloatRect result;
+    bool b3 = currentlevel.getSprite().getGlobalBounds().intersects(this->getSprite().getGlobalBounds(), result);
+
+    return (result ==  this->getSprite().getGlobalBounds());
 
 }
 
@@ -95,4 +116,5 @@ void Player::setYVelocity(float velocity){
         this->yVelocity = velocity;
 
 }
+
 

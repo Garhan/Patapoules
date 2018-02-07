@@ -36,3 +36,9 @@ float Niveau::getGravity(){
 
         return this->gravity;
 }
+float Niveau::getMinBorder(){
+    this->getSprite().getGlobalBounds().left;
+}
+float Niveau::getMaxBorder(){
+    this->getSprite().getGlobalBounds().left+this->getSprite().getGlobalBounds().width;
+}
