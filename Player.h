@@ -18,17 +18,27 @@ class Player{
         bool isDead;
         bool isJumping = false;
         float yVelocity;
+        sf::Time deltaTime;
+
+
+
 
     public :
-
-        Player(std::string filename,sf::Vector2f scale,sf::Vector2f selfOrigin,sf::Vector2f startPosition,int attack, int speed);
+        int animTimer;
+        Player(std::string filename,sf::IntRect idle,sf::Vector2f scale,sf::Vector2f selfOrigin,sf::Vector2f startPosition,int attack, int speed,sf::Time &deltaTime);
 
         void move(sf::Vector2f dir,float speed,sf::Time deltaTime);
         void jump(float jumpForce);
-        void updateYMovement(Niveau &currentLevel);
+        void updateYMovement(Niveau &currentLevel, sf::Time &deltaTime);
         void setLookDir(int dir);
 
+        void blink();
+
+        void anim();
+
         bool isInBounds(Niveau &currentlevel);
+
+
 
         sf::Sprite& getSprite();
         int getSpeed();

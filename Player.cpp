@@ -4,7 +4,7 @@
 #include <SFML/Audio.hpp>
 #include <iostream>
 #include <cmath>
-Player::Player(std::string filename,sf::Vector2f scale,sf::Vector2f selfOrigin,sf::Vector2f startPosition,int attack, int speed){
+Player::Player(std::string filename,sf::IntRect idle,sf::Vector2f scale,sf::Vector2f selfOrigin,sf::Vector2f startPosition,int attack, int speed,sf::Time &deltaTime){
 
         this->attack = attack;
         this->speed = speed;
@@ -13,13 +13,42 @@ Player::Player(std::string filename,sf::Vector2f scale,sf::Vector2f selfOrigin,s
 
 
         this->sprite.setTexture(texturePp);
+        sprite.setTextureRect(idle);
 
 
         this->sprite.setScale(scale);
         this->sprite.setOrigin(selfOrigin);
         this->sprite.setPosition(startPosition);
 
+        animTimer=0;
+
 }
+
+void Player::blink(){
+    switch (animTimer){
+    case 70 :sprite.setTextureRect(sf::IntRect(500,0,500,500));
+
+    break;
+    case 73 : sprite.setTextureRect(sf::IntRect(1000,0,500,500));
+    break;
+
+    case 76 : sprite.setTextureRect(sf::IntRect(1500,0,500,500));
+    break;
+    case 79 : sprite.setTextureRect(sf::IntRect(000,0,500,500));
+
+    }
+}
+
+void Player::anim(){
+    animTimer++;
+
+    blink();
+
+    if (animTimer >= 200)
+        animTimer = 0;
+}
+
+
 
 void Player::move(sf::Vector2f dir, float speed,sf::Time deltaTime){
 
@@ -44,18 +73,18 @@ void Player::setLookDir(int dir){
 
 }
 
-void Player::updateYMovement(Niveau &currentLevel){
+void Player::updateYMovement(Niveau &currentLevel, sf::Time &deltaTime){
 
         if (this->getSprite().getPosition().y < currentLevel.getGround()){
 
-            this->setYVelocity(this->getYVelocity()+currentLevel.getGravity());
+            this->setYVelocity(this->getYVelocity()+(currentLevel.getGravity()*deltaTime.asMilliseconds()));
 
             }
     this->setJumping(true);
 
         if (this->getSprite().getPosition().y == currentLevel.getGround()){
-
             this->setJumping(false);
+
         }
 
         if (this->getSprite().getPosition().y > currentLevel.getGround()){
@@ -65,7 +94,7 @@ void Player::updateYMovement(Niveau &currentLevel){
         }
 
 
-        this->getSprite().setPosition(this->getSprite().getPosition().x,this->getSprite().getPosition().y-getYVelocity());
+        this->getSprite().setPosition(this->getSprite().getPosition().x,this->getSprite().getPosition().y-(getYVelocity()*deltaTime.asMilliseconds()));
 
 }
 
@@ -77,6 +106,15 @@ bool Player::isInBounds(Niveau &currentlevel){
     return (result ==  this->getSprite().getGlobalBounds());
 
 }
+
+
+
+
+
+
+
+
+
 
 sf::Sprite& Player::getSprite(){
 
