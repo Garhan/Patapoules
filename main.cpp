@@ -1,16 +1,60 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
+#include "Player.h"
+#include "Niveau.h"
+#include "Ennemi.h"
+#include "Cam.h"
+
+
 
 
 int main()
 {
     using namespace sf;
-    //CrÈation de la fenetre
+
+
+    //Creation de la fenetre
     RenderWindow app(VideoMode(800, 600), "SFML window");
-    //DÈsactivation de la rÈpÈtition des inputs lors d'appui prolongÈ
+    app.setVerticalSyncEnabled(false);
+    //Desactivation de la repetition des inputs lors d'appui prolonge
     app.setKeyRepeatEnabled(false);
-    //CrÈation d'une seed pour le random
+    //Creation d'une seed pour le random
+    srand (time(NULL));
+
+
+
+
+    //Horloge Globale et par Frame
+    Clock clock;
+    Clock deltaClock;
+    Time deltaTime;
+    //Valeur de gravit√©
+
+
+    //Declaration et chargement des Textures
+
+        //Patate
+        Texture texturePatate;
+        if (!texturePatate.loadFromFile("patate.png"))
+            return -1;
+        //Poule
+        Texture texturePoule;
+        if (!texturePoule.loadFromFile("poule.png"))
+            return -1;
+        //Patapoule
+        Texture texturePp;
+        if (!texturePp.loadFromFile("patapoule.png"))
+            return -1;
+
+
+    Player player("patapoule.png",IntRect(0,0,500,500),Vector2f(0.2f, 0.2f),Vector2f(250.0f,250.0f),Vector2f(200,650),2,200,deltaTime);
+
+    //Cr√©ation de la fenetre
+    RenderWindow app(VideoMode(800, 600), "SFML window");
+    //D√©sactivation de la r√©p√©tition des inputs lors d'appui prolong√©
+    app.setKeyRepeatEnabled(false);
+    //Cr√©ation d'une seed pour le random
     srand (time(NULL));
 
     View view1;
@@ -48,7 +92,7 @@ int main()
 
 
 
-    //DÈclaration et assignation des Sprites des ennemis
+    //D√©claration et assignation des Sprites des ennemis
 
         Sprite *spriteEnnemis;
 
@@ -67,7 +111,7 @@ int main()
             //Ajustement de la taille des ennemis
             spriteEnnemis[i].setScale(0.2f,0.2f);
 
-            //Positionnement alÈatoire
+            //Positionnement al√©atoire
             float posEnnemi = (rand()%6000);
             spriteEnnemis[i].setPosition(posEnnemi,600);
         }
@@ -77,7 +121,7 @@ int main()
 
 
 
-    //DÈclaration du sprite patapoule
+    //D√©claration du sprite patapoule
         Sprite spritePp;
 
         //Assignation de la texture
@@ -91,7 +135,7 @@ int main()
 
 
 
-    //DÈclaration du sprite du Niveau
+    //D√©claration du sprite du Niveau
         Sprite spriteNiv;
 
         //Assignation de la texture
@@ -101,13 +145,13 @@ int main()
         spriteNiv.setPosition(Vector2f(0,-2100));
 
     //Systeme de son
-        //On dÈclare un buffer pour un son court
+        //On d√©clare un buffer pour un son court
         SoundBuffer buffer;
         //On assigne un son au buffer
          if (!buffer.loadFromFile("0453.ogg"))
             return -1;
 
-        //On crÈe le son
+        //On cr√©e le son
         Sound sound;
         //On assigne le buffer au son
         sound.setBuffer(buffer);
@@ -133,11 +177,28 @@ int main()
                 std::cout << elapsed1.asSeconds() << std::endl;
                 }
 
-            }
+    Niveau niveau1("niveau.png",2.5, Vector2f(0,-20),-.0010f,645,1);
+
+    Niveau currentLevel = niveau1;
+
+    //Camera principale du jeu
+    Cam cam;
+    cam.setBorders(currentLevel);
 
 
-        }
 
+    //Boucle de jeu
+    while (app.isOpen())
+    {
+        deltaTime = deltaClock.restart();
+        //On cr√©e un event
+        Event event;
+        //On scanne l'event pour r√©aliser des actions ponctuelles, a la PREMIERE frame
+        while (app.pollEvent(event))
+        {
+            //On ferme la fenetre quand on appuie sur la croix rouge
+            if (event.type == Event::Closed)
+                app.close();
 
         if(Keyboard::isKeyPressed(Keyboard::Up) && !isJumping)
         {
@@ -145,19 +206,17 @@ int main()
             isJumping = true;
         }
 
-        if(isJumping)
-        {
-            playerVelocity.y += (gravity * deltaTime.asSeconds());
-            spritePp.move(playerVelocity * deltaTime.asSeconds());
+
         }
 
 
-        if(spritePp.getPosition().y > 670.f)
-                {
-                        spritePp.setPosition( { spritePp.getPosition().x, 670.f } );
-                        isJumping = false;
-                }
+        //On clear le tableau
         app.clear();
+
+
+        if (Keyboard::isKeyPressed(Keyboard::Up))
+        {
+            player.jump(0.4);
 
         app.draw(spriteNiv);
         app.draw(spritePp);
@@ -178,9 +237,24 @@ int main()
                 view1.move(Vector2f(-speed, 0)* deltaTime.asSeconds());
 
 
+        }
 
-            if (spritePp.getPosition().x >= 25 )
+        if (Keyboard::isKeyPressed(Keyboard::Left))
+        {
+            if (currentLevel.isPlayerIn(player) )
             {
+
+                player.move(Vector2f(-1.0,0.0),player.getSpeed(),deltaTime);
+                player.jump(0.15);
+                player.setLookDir(-1);
+                //spritePp.rotate(-speed * deltaTime.asSeconds());
+            }
+
+
+
+        }
+
+
                 spritePp.move(Vector2f(-speed, 0) * deltaTime.asSeconds());
                 //spritePp.rotate(-speed * deltaTime.asSeconds());
             }
@@ -194,26 +268,65 @@ int main()
                 //Camera is not exiting level
                 view1.move(Vector2f(speed, 0)* deltaTime.asSeconds());
 
-            if (spritePp.getPosition().x <= spriteNiv.getGlobalBounds().width - 25 )
+
+        if (Keyboard::isKeyPressed(Keyboard::Right))
+        {
+            if (currentLevel.isPlayerIn(player) )
             {
+
+                player.move(Vector2f(1.0,0.0),player.getSpeed(),deltaTime);
+                player.jump(0.15);
+                player.setLookDir(1);
+                //spritePp.rotate(-speed * deltaTime.asSeconds());
+
                 spritePp.move(Vector2f(speed, 0) * deltaTime.asSeconds());
                 //spritePp.rotate(speed * deltaTime.asSeconds());
+
             }
 
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::S))
-        {
-            sound.play();
-        }
+
+
+
         if (Keyboard::isKeyPressed(Keyboard::P))
+
+        if (Keyboard::isKeyPressed(Keyboard::S))
+
         {
-            std::cout <<"posy : "<< spritePp.getPosition().y << std::endl;
+            std::cout <<"velocy : "<< player.getYVelocity() << std::endl;
 
 
         }
 
-        app.setView(view1);
+        if (Keyboard::isKeyPressed(Keyboard::J))
+
+        if (Keyboard::isKeyPressed(Keyboard::P))
+
+        {
+            std::cout <<"camPos "<< cam.getView().getCenter().x << std::endl;
+
+
+        }
+
+        cam.update(currentLevel,player,deltaTime);
+
+        //(currentLevel.getEnnemies()[1]).getSprite().setPosition(200.0f,400.0f);
+        std::cout << (currentLevel.getEnnemies()[0]).getSprite().getPosition().x <<std::endl;
+
+       // player.anim();
+        std::cout <<player.getSprite().getPosition().x<<std::endl;
+        //currentLevel.updateEnnemis(player,app);
+
+        app.draw((currentLevel.getEnnemies()[0]).getSprite());
+        currentLevel.updatePlayer(player, deltaTime);
+        app.draw(currentLevel.getSprite());
+        app.draw(player.getSprite());
+
+        //On configure la cam√©ra sur view1
+        app.setView(cam.getView());
+
+        //On affiche la fenetre
         app.display();
 
 
