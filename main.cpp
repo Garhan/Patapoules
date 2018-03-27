@@ -13,9 +13,9 @@ int main()
 {
     using namespace sf;
 
-
     //Creation de la fenetre
     RenderWindow app(VideoMode(800, 600), "SFML window");
+    app.setVerticalSyncEnabled(false);
     //Desactivation de la repetition des inputs lors d'appui prolonge
     app.setKeyRepeatEnabled(false);
     //Creation d'une seed pour le random
@@ -49,63 +49,13 @@ int main()
 
     Player player("patapoule.png",IntRect(0,0,500,500),Vector2f(0.2f, 0.2f),Vector2f(250.0f,250.0f),Vector2f(200,650),2,200,deltaTime);
 
-    Niveau niveau1("niveau.png",2.5, Vector2f(0,-20),-.0010f,645);
-
+    Niveau niveau1("niveau.png",2.5, Vector2f(0,-20),-.0010f,645,1);
 
     Niveau currentLevel = niveau1;
 
     //Camera principale du jeu
     Cam cam;
     cam.setBorders(currentLevel);
-
-
-
-    //Declaration et assignation des Sprites des ennemi
-
-       /*
-        Ennemi *lstEnnemis;
-
-        lstEnnemis = new Ennemi[nbEnnemis];
-        for (int i = 0; i < nbEnnemis; i++)
-        {
-            //1 chance sur 2 patate/poule
-            int typeEnnemi = rand() %2;
-
-            if (typeEnnemi == 1){
-                lstEnnemis[i].spriteEnnemi.setTexture(texturePatate);
-                lstEnnemis[i].speed = 400.0f;
-                lstEnnemis[i].attackSpeed = 1.0f;
-                lstEnnemis[i].attack = 10.0f;
-            } else {
-                lstEnnemis[i].spriteEnnemi.setTexture(texturePoule);
-                lstEnnemis[i].speed = 600.0f;
-                lstEnnemis[i].attackSpeed = 2.0f;
-                lstEnnemis[i].attack = 15.0f;
-            }
-
-                lstEnnemis[i].spriteEnnemi.setScale(0.2f,0.2f);
-
-                float posEnnemi = (rand()%6000);
-                lstEnnemis[i].spriteEnnemi.setPosition(posEnnemi,600);
-        }
-            */
-
-
-
-
-
-
-    //Systeme de son
-        //On declare un buffer pour un son court
-        //SoundBuffer buffer;
-        //On assigne un son au buffer
-         //if (!buffer.loadFromFile("0453.ogg"))
-            //return -1;
-
-        //On cree le son
-        //Sound sound;
-        //On assigne le buffer au son
-        //sound.setBuffer(buffer);
 
 
     //Boucle de jeu
@@ -137,7 +87,7 @@ int main()
 
         if (Keyboard::isKeyPressed(Keyboard::Left))
         {
-            if (player.isInBounds(currentLevel) )
+            if (currentLevel.isPlayerIn(player) )
             {
                 player.move(Vector2f(-1.0,0.0),player.getSpeed(),deltaTime);
                 player.jump(0.15);
@@ -152,7 +102,7 @@ int main()
 
         if (Keyboard::isKeyPressed(Keyboard::Right))
         {
-            if (player.getSprite().getPosition().x <= currentLevel.getSprite().getGlobalBounds().width - 25 )
+            if (currentLevel.isPlayerIn(player) )
             {
                 player.move(Vector2f(1.0,0.0),player.getSpeed(),deltaTime);
                 player.jump(0.15);
@@ -163,7 +113,6 @@ int main()
         }
 
 
-        player.updateYMovement(currentLevel,deltaTime);
 
         if (Keyboard::isKeyPressed(Keyboard::P))
         {
@@ -180,8 +129,15 @@ int main()
 
         cam.update(currentLevel,player,deltaTime);
 
-        player.anim();
+        //(currentLevel.getEnnemies()[1]).getSprite().setPosition(200.0f,400.0f);
+        std::cout << (currentLevel.getEnnemies()[0]).getSprite().getPosition().x <<std::endl;
 
+       // player.anim();
+        std::cout <<player.getSprite().getPosition().x<<std::endl;
+        //currentLevel.updateEnnemis(player,app);
+
+        app.draw((currentLevel.getEnnemies()[0]).getSprite());
+        currentLevel.updatePlayer(player, deltaTime);
         app.draw(currentLevel.getSprite());
         app.draw(player.getSprite());
 

@@ -1,6 +1,7 @@
 #ifndef NIVEAU_H
 #define NIVEAU_H
-
+#include "Player.h"
+#include "Ennemi.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -11,15 +12,22 @@ class Niveau{
         float ground;
         sf::Sprite sprite;
         sf::Texture textureNiv;
+        int ennemiCount;
+        std::vector<Ennemi> ennemiPool;
 
     public :
         Niveau(std::string filename, float scale,sf::Vector2f shift,float gravity,float ground);
+        Niveau(std::string filename, float scale,sf::Vector2f shift,float gravity,float ground,int enCount);
+
+        void updateEnnemis(Player &player,sf::RenderWindow &app);
+        void updatePlayer(Player &player, sf::Time &deltaTime);
+        bool isPlayerIn(Player &player);
         sf::Sprite& getSprite();
         float getGravity();
         float getGround();
         float getMinBorder();
         float getMaxBorder();
-
+        std::vector<Ennemi> getEnnemies();
 
 
 };

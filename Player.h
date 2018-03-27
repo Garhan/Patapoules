@@ -1,7 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "Niveau.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -29,14 +28,14 @@ class Player{
 
         void move(sf::Vector2f dir,float speed,sf::Time deltaTime);
         void jump(float jumpForce);
-        void updateYMovement(Niveau &currentLevel, sf::Time &deltaTime);
+
         void setLookDir(int dir);
 
         void blink();
 
         void anim();
 
-        bool isInBounds(Niveau &currentlevel);
+
 
 
 

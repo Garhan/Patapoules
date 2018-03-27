@@ -1,4 +1,3 @@
-#include "Niveau.h"
 #include "Player.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -21,7 +20,6 @@ Player::Player(std::string filename,sf::IntRect idle,sf::Vector2f scale,sf::Vect
         this->sprite.setPosition(startPosition);
 
         animTimer=0;
-
 }
 
 void Player::blink(){
@@ -73,39 +71,10 @@ void Player::setLookDir(int dir){
 
 }
 
-void Player::updateYMovement(Niveau &currentLevel, sf::Time &deltaTime){
-
-        if (this->getSprite().getPosition().y < currentLevel.getGround()){
-
-            this->setYVelocity(this->getYVelocity()+(currentLevel.getGravity()*deltaTime.asMilliseconds()));
-
-            }
-    this->setJumping(true);
-
-        if (this->getSprite().getPosition().y == currentLevel.getGround()){
-            this->setJumping(false);
-
-        }
-
-        if (this->getSprite().getPosition().y > currentLevel.getGround()){
-
-            this->setYVelocity(0.f);
-            this->getSprite().setPosition(this->getSprite().getPosition().x,currentLevel.getGround());
-        }
 
 
-        this->getSprite().setPosition(this->getSprite().getPosition().x,this->getSprite().getPosition().y-(getYVelocity()*deltaTime.asMilliseconds()));
-
-}
 
 
-bool Player::isInBounds(Niveau &currentlevel){
-    sf::FloatRect result;
-    bool b3 = currentlevel.getSprite().getGlobalBounds().intersects(this->getSprite().getGlobalBounds(), result);
-
-    return (result ==  this->getSprite().getGlobalBounds());
-
-}
 
 
 

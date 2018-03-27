@@ -1,25 +1,29 @@
 #ifndef ENNEMI_H
 #define ENNEMI_H
-
+#include "Player.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
 class Ennemi{
 
-    public :
+    private :
         int vie;
         int vieMax;
         float attack;
         float attackSpeed;
         float speed;
 
-        enum TypeEnnemi{PATATE=1, POULE =2};
+        bool active = 0;
 
-        int sprite;
-        bool isDead;
-    private :
+        sf::Sprite sprite;
+        sf::Texture textureEn;
 
-        Ennemi();
+    public :
+
+        Ennemi(int type);
+        bool detect(Player player);
+
+        sf::Sprite& getSprite();
 
 };
 #endif
